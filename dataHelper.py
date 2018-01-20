@@ -92,3 +92,18 @@ def get_para_label(file_path):
             else:
                 labels.append([0, 0, 0, 0, 1])
             paras.append(para)
+
+
+def batch_iter_eval(x, y, batch_size=64):
+    """生成批次数据"""
+    data_len = len(x)
+    num_batch = int((data_len - 1) / batch_size) + 1
+
+    indices = np.random.permutation(np.arange(data_len))
+    x_shuffle = x[indices]
+    y_shuffle = y[indices]
+
+    for i in range(num_batch):
+        start_id = i * batch_size
+        end_id = min((i + 1) * batch_size, data_len)
+        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]

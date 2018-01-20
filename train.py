@@ -22,12 +22,12 @@ import gc
 from textCNN import TextCNN
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
 tf.flags.DEFINE_string("data_file", "./data/labeled_data",
                        "Data source for the  data.")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 64, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
@@ -87,9 +87,14 @@ print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 # ===============================================
 
 with tf.Graph().as_default():
+    gpu_options = tf.GPUOptions(
+        per_process_gpu_memory_fraction=0.5,
+        allow_growth=True
+    )
     session_config = tf.ConfigProto(
         allow_soft_placement=FLAGS.allow_soft_placement,
-        log_device_placement=FLAGS.log_device_placement
+        log_device_placement=FLAGS.log_device_placement,
+        gpu_options=gpu_options
     )
     sess = tf.Session(config=session_config)
     with sess.as_default():
@@ -116,7 +121,6 @@ with tf.Graph().as_default():
                 sparsity_summary = tf.summary.scalar("{}/grad/sparsity".format(v.name), tf.nn.zero_fraction(g))
                 grad_summaries.append(grad_hist_summary)
                 grad_summaries.append(sparsity_summary)
-            gc.collect()
         grad_summaries_merged = tf.summary.merge(grad_summaries)
 
         # Output directory for models and summaries
@@ -134,9 +138,11 @@ with tf.Graph().as_default():
         train_summary_writer = tf.summary.FileWriter(train_summary_dir, sess.graph)
 
         # Dev summaries
+        """
         dev_summary_op = tf.summary.merge([loss_summary, acc_summary])
         dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
         dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
+        """
 
         # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
         checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
@@ -177,13 +183,24 @@ with tf.Graph().as_default():
             :param y_dev:
             :return:
             """
-            feed_dict = {
-                cnn.input_x: x_dev,
-                cnn.input_y: y_dev,
-                cnn.dropout_keep_prob: 1.0
-            }
-            step, summaries, loss, accuracy = sess.run([global_step, dev_summary_op, cnn.loss, cnn.accuracy], feed_dict)
-            return loss, accuracy
+            data_len = len(x_dev)
+            batch_eval = dataHelper.batch_iter_eval(x_dev, y_dev)
+            total_loss = 0.0
+            total_acc = 0.0
+            for x_batch_eval, y_batch_eval in batch_eval:
+                batch_len = len(x_batch_eval)
+                feed_dict = {
+                    cnn.input_x: x_batch_eval,
+                    cnn.input_y: y_batch_eval,
+                    cnn.dropout_keep_prob: 1.0
+                }
+                loss, accuracy = sess.run(
+                    [cnn.loss, cnn.accuracy],
+                    feed_dict)
+                total_loss += loss * batch_len
+                total_acc += accuracy * batch_len
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: loss {:g}, acc {:g}".format(time_str, total_loss/data_len, total_acc/data_len))
 
         # Generate batches
         batches = dataHelper.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
@@ -195,32 +212,8 @@ with tf.Graph().as_default():
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
                 print("\nEvaluation:")
-                dev_batches = dataHelper.batch_iter(list(zip(x_dev, y_dev)), FLAGS.batch_size, 1)
-                total_cost = 0
-                total_acc = 0
-                for dev_batch in dev_batches:
-                    x_dev_batch, y_dev_batch = zip(*dev_batch)
-                    dev_loss, dev_acc = dev_step(x_dev, y_dev)
-                    multiples = (len(y_dev) * 5 / FLAGS.batch_size)
-                    total_cost += dev_loss / multiples
-                    total_acc += dev_acc / multiples
-                dev_time_str = datetime.datetime.now().isoformat()
-                print("{}: loss {:g}, acc {:g}".format(dev_time_str, total_cost, total_acc))
+                dev_step(x_dev, y_dev)
                 print("")
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))
-        print("")
-        # print("\nEvaluation:")
-        # dev_batches = dataHelper.batch_iter(list(zip(x_dev, y_dev)), FLAGS.batch_size, 5)
-        # total_cost = 0
-        # total_acc = 0
-        # for dev_batch in dev_batches:
-        #     x_dev_batch, y_dev_batch = zip(*dev_batch)
-        #     dev_loss, dev_acc = dev_step(x_dev, y_dev)
-        #     multiples = (len(y_dev)*5/FLAGS.batch_size)
-        #     total_cost += dev_loss/multiples
-        #     total_acc += dev_acc/multiples
-        # time_str = datetime.datetime.now().isoformat()
-        # print("{}: loss {:g}, acc {:g}".format(time_str, total_cost, total_acc))
-        # print("")
