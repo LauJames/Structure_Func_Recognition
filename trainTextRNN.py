@@ -3,11 +3,11 @@
 
 """
 
-@Author   : Lau James
-@Contact  : LauJames2017@whu.edu.cn
-@Project  : StructureFuncRecognition 
-@File     : train.py
-@Time     : 2017/12/26 16:00
+@Author : Lau James
+@Contact : LauJames2017@whu.edu.cn
+@Project : Structure_Func_Recognition 
+@File : trainTextRNN.py
+@Time : 1/20/18 2:36 PM
 @Software : PyCharm
 @Copyright: "Copyright (c) 2017 Lau James. All Rights Reserved"
 """
@@ -18,26 +18,29 @@ import os
 import dataHelper
 import time
 import datetime
-import gc
-from textCNN import TextCNN
+from textRNN import TextRNN
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.05, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data",
+tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("data_file", "./data/labeled_data_part",
                        "Data source for the  data.")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
-tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
-tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
+tf.flags.DEFINE_integer("embedding_dim", 64, "Dimensionality of character embedding (default: 128)")
+#tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
+tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
+tf.flags.DEFINE_float("dropout_keep_prob", 0.8, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
+tf.flags.DEFINE_integer("num_layers", 2, "number of layers (default: 2)")
+tf.flags.DEFINE_integer("hidden_dim", 128, "neural numbers of hidden layer (default: 128)")
+tf.flags.DEFINE_string("rnn_type", 'gru', "rnn type (default: gru)")
+tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 100, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 5, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 500, "Evaluate model on dev set after this many steps (default: 100)")
-tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 100)")
+tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 
 # Misc Parameters
@@ -50,7 +53,6 @@ print("\nParameters:")
 for attr, value in sorted(FLAGS.__flags.items()):
     print("{}={}".format(attr.upper(), value))
 print("")
-
 
 # Data Preparation
 # ==================================================
@@ -98,19 +100,19 @@ with tf.Graph().as_default():
     )
     sess = tf.Session(config=session_config)
     with sess.as_default():
-        cnn = TextCNN(
+        rnn = TextRNN(
             sequence_length=x_train.shape[1],
-            num_classes=y_train.shape[1],
+            num_classes=FLAGS.num_classes,
             vocab_size=len(vocab_processor.vocabulary_),
-            embedding_size=FLAGS.embedding_dim,
-            filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
-            num_filters=FLAGS.num_filters,
-            l2_reg_lambda=FLAGS.l2_reg_lambda)
+            embedding_dim=FLAGS.embedding_dim,
+            num_layers=FLAGS.num_layers,
+            hidden_dim=FLAGS.hidden_dim,
+            rnn=FLAGS.rnn_type)
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(1e-3)
-        grads_and_vars = optimizer.compute_gradients(cnn.loss)
+        optimizer = tf.train.AdamOptimizer(FLAGS.learning_rate)
+        grads_and_vars = optimizer.compute_gradients(rnn.loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
         # Keep track of gradient values and sparsity (optional)
@@ -125,12 +127,12 @@ with tf.Graph().as_default():
 
         # Output directory for models and summaries
         timestamp = str(int(time.time()))
-        out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+        out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs-rnn", timestamp))
         print("Writing to {}\n".format(out_dir))
 
         # Summaries for loss and accuracy
-        loss_summary = tf.summary.scalar("loss", cnn.loss)
-        acc_summary = tf.summary.scalar("accuracy", cnn.accuracy)
+        loss_summary = tf.summary.scalar("loss", rnn.loss)
+        acc_summary = tf.summary.scalar("accuracy", rnn.accuracy)
 
         # Train Summaries
         train_summary_op = tf.summary.merge([loss_summary, acc_summary, grad_summaries_merged])
@@ -157,6 +159,7 @@ with tf.Graph().as_default():
         # Initialize all variables
         sess.run(tf.global_variables_initializer())
 
+
         def train_step(x_batch, y_batch):
             """
             A single training step
@@ -165,16 +168,17 @@ with tf.Graph().as_default():
             :return:
             """
             feed_dict = {
-                cnn.input_x: x_batch,
-                cnn.input_y: y_batch,
-                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+                rnn.input_x: x_batch,
+                rnn.input_y: y_batch,
+                rnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
 
-            _, step, summaries, loss, accuracy = sess.run([train_op, global_step, train_summary_op, cnn.loss,
-                                                           cnn.accuracy], feed_dict)
+            _, step, summaries, loss, accuracy = sess.run([train_op, global_step, train_summary_op, rnn.loss,
+                                                           rnn.accuracy], feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
             train_summary_writer.add_summary(summaries, step)
+
 
         def dev_step(x_dev, y_dev):
             """
@@ -190,17 +194,18 @@ with tf.Graph().as_default():
             for x_batch_eval, y_batch_eval in batch_eval:
                 batch_len = len(x_batch_eval)
                 feed_dict = {
-                    cnn.input_x: x_batch_eval,
-                    cnn.input_y: y_batch_eval,
-                    cnn.dropout_keep_prob: 1.0
+                    rnn.input_x: x_batch_eval,
+                    rnn.input_y: y_batch_eval,
+                    dropout_keep_prob: 1.0
                 }
                 loss, accuracy = sess.run(
-                    [cnn.loss, cnn.accuracy],
+                    [rnn.loss, rnn.accuracy],
                     feed_dict)
                 total_loss += loss * batch_len
                 total_acc += accuracy * batch_len
             time_str = datetime.datetime.now().isoformat()
-            print("{}: loss {:g}, acc {:g}".format(time_str, total_loss/data_len, total_acc/data_len))
+            print("{}: loss {:g}, acc {:g}".format(time_str, total_loss / data_len, total_acc / data_len))
+
 
         # Generate batches
         batches = dataHelper.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
