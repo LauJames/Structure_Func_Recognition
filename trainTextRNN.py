@@ -196,7 +196,7 @@ with tf.Graph().as_default():
                 feed_dict = {
                     rnn.input_x: x_batch_eval,
                     rnn.input_y: y_batch_eval,
-                    dropout_keep_prob: 1.0
+                    rnn.dropout_keep_prob: 1.0
                 }
                 loss, accuracy = sess.run(
                     [rnn.loss, rnn.accuracy],

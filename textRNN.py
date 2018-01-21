@@ -28,7 +28,7 @@ class TextRNN(object):
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name='input_x')
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name='input_y')
-        dropout_keep_prob = tf.placeholder(tf.float32, name='keep_prob')
+        self.dropout_keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
         # Keeping track of L2 regularization loss
         # l2_loss = tf.constant(0.0)
@@ -56,7 +56,7 @@ class TextRNN(object):
                 cell = lstm_cell()
             else:
                 cell = gru_cell()
-            return tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=dropout_keep_prob)
+            return tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=self.dropout_keep_prob)
         # end of RNN model
 
         with tf.name_scope('rnn'):
@@ -71,7 +71,7 @@ class TextRNN(object):
         with tf.name_scope('score'):
             # Dense layer, followed a relu activiation layer
             fc = tf.layers.dense(last, hidden_dim, name='fc1')
-            fc = tf.contrib.layers.dropout(fc, keep_prob=dropout_keep_prob)
+            fc = tf.nn.dropout(fc, keep_prob=self.dropout_keep_prob)
             fc = tf.nn.relu(fc)
 
             # classfier
