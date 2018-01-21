@@ -95,7 +95,7 @@ def get_para_label(file_path):
 
 
 def batch_iter_eval(x, y, batch_size=64):
-    """生成批次数据"""
+    """生成随机批次数据"""
     data_len = len(x)
     num_batch = int((data_len - 1) / batch_size) + 1
 

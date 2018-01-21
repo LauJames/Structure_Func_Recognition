@@ -79,6 +79,7 @@ with graph.as_default():
 
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+        # 注意后面为0表示第一个为这个名字的，可能出现多个同名，tensorflow会根据0/1/2/3来避免冲突
 
         # Generate batches for on epoch
         batches = dataHelper.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
