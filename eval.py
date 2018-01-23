@@ -27,7 +27,7 @@ from tensorflow.contrib import learn
 tf.flags.DEFINE_string("data_file", "./data/labeled_data", "Data source")
 
 # Eval Parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
 tf.flags.DEFINE_string("checkpoint_dir", "./runs/1514606780/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 
