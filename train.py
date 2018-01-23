@@ -18,7 +18,6 @@ import os
 import dataHelper
 import time
 import datetime
-import gc
 from textCNN import TextCNN
 
 # Data loading params
