@@ -18,9 +18,10 @@ import os
 import csv
 import dataHelper
 from tensorflow.contrib import learn
+from sklearn import metrics
 
 # Parameters
-# 运行时传参：./eval.py eval_train checkpoint_dir="./runs/1514432906/checkpoints/"
+# 运行时传参：./eval.py eval_train checkpoint_dir="./runs/1516450545/checkpoints/"
 # ====================================
 
 # Data Parameters
@@ -28,7 +29,7 @@ tf.flags.DEFINE_string("data_file", "./data/labeled_data", "Data source")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/1514606780/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/1516450545/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 
 # Misc Parameters
@@ -54,8 +55,6 @@ else:
 vocab_path = os.path.join(FLAGS.checkpoint_dir, '..', "vocab")
 vocab_processor = learn.preprocessing.VocabularyProcessor.restore(vocab_path)
 x_test = np.array(list(vocab_processor.transform(x_raw)))
-
-print("\nEvalution...\n")
 
 # Evaluation
 # =================================
@@ -96,10 +95,14 @@ if y_test is not None:
     correct_predictions = float(sum(all_predictions == y_test))
     print("Total number of test examples: {}".format(len(y_test)))
     print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
+    # 混淆矩阵
+    print("Confusion Matrix...")
+    cm = metrics.confusion_matrix(y_test, all_predictions)
+    print(cm)
 
 # Save the evaluation to a csv
-predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
-out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
-print("Saving evaluation to {0}".format(out_path))
-with open(out_path, 'w') as f:
-    csv.writer(f).writerows(predictions_human_readable)
+# predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
+# out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
+# print("Saving evaluation to {0}".format(out_path))
+# with open(out_path, 'w') as f:
+#     csv.writer(f).writerows(predictions_human_readable)
