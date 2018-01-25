@@ -115,7 +115,7 @@ def load_data(data_file, dev_sample_percentage, save_vocab_dir):
     x_text, y = get_para_label(data_file)
 
     # Build vocabulary
-    max_document_length = max([len(x.split(" ")) for x in x_text])
+    # max_document_length = max([len(x.split(" ")) for x in x_text])
     vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_document_length=600)
     # 神器，填充到最大长度
     x = np.array(list(vocab_processor.fit_transform(x_text)))
