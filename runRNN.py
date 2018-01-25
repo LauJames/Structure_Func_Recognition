@@ -24,7 +24,7 @@ import dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data_part",
+tf.flags.DEFINE_string("data_file", "./data/labeled_data",
                        "Data source for the  data.")
 tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textrnn", "saving path of tensorboard")
 tf.flags.DEFINE_string("save_dir", "checkpoints/textrnn", "save base dir")
@@ -32,7 +32,7 @@ tf.flags.DEFINE_string("save_dir", "checkpoints/textrnn", "save base dir")
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 200, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
-tf.flags.DEFINE_integer("vocab_size", 5000, "vocabulary size (default: 5000)")
+tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.8, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
@@ -43,7 +43,7 @@ tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 5, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 250, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
@@ -67,7 +67,7 @@ def feed_data(x_batch, y_batch, keep_prob):
     feed_dict = {
         model.input_x: x_batch,
         model.input_y: y_batch,
-        model.keep_prob: keep_prob
+        model.dropout_keep_prob: keep_prob
     }
     return feed_dict
 
@@ -114,7 +114,7 @@ def train():
     # Configuring Saver
 
     saver = tf.train.Saver()
-    if not os.path.exists():
+    if not os.path.exists(FLAGS.save_dir):
         os.makedirs(FLAGS.save_dir)
 
     # Load data
@@ -137,7 +137,7 @@ def train():
     require_imporvement = 1000  # 如果超过1000论未提升，提前结束训练
 
     tag = False
-    for epoch in range(FLAGS.num_epoch):
+    for epoch in range(FLAGS.num_epochs):
         print('Epoch:', epoch + 1)
         batch_train = dataHelper.batch_iter_per_epoch(x_train, y_train, FLAGS.batch_size)
         for x_batch, y_batch in batch_train:
