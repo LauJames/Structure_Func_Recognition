@@ -15,6 +15,8 @@
 import numpy as np
 import re
 import codecs
+import tensorflow as tf
+import os
 
 
 def clean_str(string):
@@ -96,6 +98,52 @@ def get_para_label(file_path):
 
 def batch_iter_eval(x, y, batch_size=32):
     """生成随机批次数据"""
+    data_len = len(x)
+    num_batch = int((data_len - 1) / batch_size) + 1
+
+    indices = np.random.permutation(np.arange(data_len))
+    x_shuffle = x[indices]
+    y_shuffle = y[indices]
+
+    for i in range(num_batch):
+        start_id = i * batch_size
+        end_id = min((i + 1) * batch_size, data_len)
+        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]
+
+
+def load_data(data_file, dev_sample_percentage, save_vocab_dir):
+    x_text, y = get_para_label(data_file)
+
+    # Build vocabulary
+    max_document_length = max([len(x.split(" ")) for x in x_text])
+    vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_document_length)
+    # 神器，填充到最大长度
+    x = np.array(list(vocab_processor.fit_transform(x_text)))
+
+    # Write vocabulary
+    vocab_processor.save(os.path.join(save_vocab_dir, "vocab"))
+
+    # Randomly shuffle data
+    np.random.seed(10)
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    x_shuffled = x[shuffle_indices]
+    y_shuffled = y[shuffle_indices]
+
+    # Split train/test set
+    # TODO: This is very crude, should use cross-validation
+    dev_sample_index = -1 * int(dev_sample_percentage * float(len(y)))
+    x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+    y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+
+    del x, y, x_shuffled, y_shuffled
+
+    print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+    print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+    return x_train, y_train, x_dev, y_dev
+
+
+def batch_iter_per_epoch(x, y, batch_size=64):
+    """生成批次数据,每个epoch"""
     data_len = len(x)
     num_batch = int((data_len - 1) / batch_size) + 1
 
