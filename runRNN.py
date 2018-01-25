@@ -226,7 +226,7 @@ if __name__ == '__main__':
     print("")
 
     model = TextRnnNew(
-        sequence_length=FLAGS.sequence_length,
+        sequence_length=FLAGS.seq_length,
         num_classes=FLAGS.num_classes,
         vocab_size=FLAGS.vocab_size,
         embedding_dim=FLAGS.embedding_dim,
