@@ -22,11 +22,11 @@ from textRNN import TextRNN
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data_part",
+tf.flags.DEFINE_string("data_file", "./data/labeled_data",
                        "Data source for the  data.")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 64, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 200, "Dimensionality of character embedding (default: 128)")
 #tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.8, "Dropout keep probability (default: 0.5)")
@@ -37,10 +37,10 @@ tf.flags.DEFINE_string("rnn_type", 'gru', "rnn type (default: gru)")
 tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 5, "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer("evaluate_every", 500, "Evaluate model on dev set after this many steps (default: 100)")
-tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
+tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("num_epochs", 100, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("evaluate_every", 250, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 
 # Misc Parameters
