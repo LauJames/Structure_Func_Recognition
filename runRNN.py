@@ -205,6 +205,7 @@ def test():
         all_predictions = np.concatenate([all_predictions, batch_predictions])
 
     # Evaluation indexes
+    y_test = np.argmax(y_test, axis=1)
     print("Precision, Recall, F1-Score ...")
     print(metrics.classification_report(y_test, all_predictions, target_names=['Introduction', 'Relaterd work',
                                                                                'Methods', 'Experiment', 'Conclusion']))
