@@ -185,7 +185,7 @@ def test():
     x_raw, y_test = dataHelper.get_para_label(FLAGS.data_file)
     y_test = np.argmax(y_test, axis=1)
     vocab_path = os.path.join(FLAGS.save_dir, "vocab")
-    vocab_processor = tf.learn.preprocessing.VocabularyProcessor.restore(vocab_path)
+    vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(vocab_path)
     x_test = np.array(list(vocab_processor.transform(x_raw)))
 
     session = tf.Session()
