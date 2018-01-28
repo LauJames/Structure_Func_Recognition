@@ -16,7 +16,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import csv
-import dataHelper
+from data import dataHelper
 from tensorflow.contrib import learn
 from sklearn import metrics
 

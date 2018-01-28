@@ -20,7 +20,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn import metrics
 from textRNN_new import TextRnnNew
-import dataHelper
+from data import dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
@@ -55,6 +55,7 @@ tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 save_path = os.path.join(FLAGS.save_dir, 'best_validation')
+
 
 def get_time_dif(start_time):
     """获取已使用时间"""

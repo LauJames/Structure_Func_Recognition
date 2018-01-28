@@ -15,7 +15,7 @@
 import tensorflow as tf
 import numpy as np
 import os
-import dataHelper
+from data import dataHelper
 import time
 import datetime
 from textRNN import TextRNN
