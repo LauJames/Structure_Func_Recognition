@@ -21,21 +21,21 @@ import numpy as np
 import tensorflow as tf
 from sklearn import metrics
 from CNNmodel import TextCNN
-from data import dataHelper
+import data.dataHelper as dataHelper
 
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "../data/labeled_data",
+tf.flags.DEFINE_float("dev_sample_percentage", 0.05, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("data_file", "./data/labeled_data",
                        "Data source for the  data.")
-tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textrnn", "saving path of tensorboard")
-tf.flags.DEFINE_string("save_dir", "checkpoints/textrnn", "save base dir")
+tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN", "saving path of tensorboard")
+tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN", "save base dir")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 200, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
-tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
@@ -230,7 +230,7 @@ def test():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-        raise ValueError("Please input: python3 runRNN.py [train/test]")
+        raise ValueError("Please input: python3 runCNN.py [train/test]")
 
     print("\nParameters:")
     for attr, value in sorted(FLAGS.__flags.items()):
