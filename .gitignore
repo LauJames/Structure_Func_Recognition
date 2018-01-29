@@ -4,3 +4,8 @@
 /data/labeled_data
 /data/partData.txt
 /.idea/
+/runs-rnn/
+/tensorboard_dir/
+/log/
+/checkpoints/
+/runs/

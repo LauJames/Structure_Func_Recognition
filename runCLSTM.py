@@ -27,10 +27,10 @@ tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training
 tf.flags.DEFINE_string("data_file", "./data/labeled_data",
                        "Data source for the  data.")
 tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/CLSTM", "saving path of tensorboard")
-tf.flags.DEFINE_string("save_dir", "checkpoints/textrnn", "save base dir")
+tf.flags.DEFINE_string("save_dir", "checkpoints/CLSTM", "save base dir")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
@@ -126,7 +126,16 @@ def train():
     print("Time usage:", time_dif)
 
     # Create Session
-    session = tf.Session()
+    gpu_options = tf.GPUOptions(
+        per_process_gpu_memory_fraction=0.5,
+        allow_growth=True
+    )
+    session_config = tf.ConfigProto(
+        allow_soft_placement=FLAGS.allow_soft_placement,
+        log_device_placement=FLAGS.log_device_placement,
+        gpu_options=gpu_options
+    )
+    session = tf.Session(config=session_config)
     session.run(tf.global_variables_initializer())
     writer.add_graph(session.graph)
 
@@ -220,7 +229,7 @@ def test():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-        raise ValueError("Please input: python3 runRNN.py [train/test]")
+        raise ValueError("Please input: python3 runCLSTM.py [train/test]")
 
     print("\nParameters:")
     for attr, value in sorted(FLAGS.__flags.items()):
