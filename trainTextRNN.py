@@ -18,7 +18,7 @@ import os
 from data import dataHelper
 import time
 import datetime
-from textRNN import TextRNN
+from model.textRNN import TextRNN
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")

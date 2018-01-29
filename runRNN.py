@@ -19,7 +19,7 @@ import datetime
 import numpy as np
 import tensorflow as tf
 from sklearn import metrics
-from textRNN_new import TextRnnNew
+from model.textRNN_new import TextRnnNew
 from data import dataHelper
 
 # Data loading params

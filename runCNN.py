@@ -20,7 +20,7 @@ import datetime
 import numpy as np
 import tensorflow as tf
 from sklearn import metrics
-from CNNmodel import TextCNN
+from model.CNNmodel import TextCNN
 import data.dataHelper as dataHelper
 
 
