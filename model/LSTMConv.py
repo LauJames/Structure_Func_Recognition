@@ -23,5 +23,7 @@ class LSTMConv(object):
 
     def __init__(self, sequence_length, num_classes, vocab_size, embedding_dim, num_layers,
                  hidden_dim, learning_rate):
+        
         # Placeholder for input, output and dropout
-        self.input_x = tf.placeholder()
+        self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name='input_x')
+        self.input_y = tf.placeholder(tf.float32)
