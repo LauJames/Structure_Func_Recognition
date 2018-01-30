@@ -214,11 +214,19 @@ def test():
     x_test_batches = dataHelper.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
     all_predictions = []
     all_predict_prob = []
+    count = 0  # concatenate第一次不能为空，需要加个判断来赋all_predict_prob值
     for x_test_batch in x_test_batches:
-        batch_predictions, batch_predict_prob = session.run(model.y_pred, model.scores, feed_dict={
-            model.input_x: x_test_batch, model.dropout_keep_prob: 1.0})
+        batch_predictions, batch_predict_prob = session.run([model.y_pred, model.prob],
+                                                            feed_dict={
+                                                                model.input_x: x_test_batch,
+                                                                model.dropout_keep_prob: 1.0
+                                                            })
         all_predictions = np.concatenate([all_predictions, batch_predictions])
-        all_predict_prob = np.concatenate([all_predict_prob, batch_predict_prob])
+        if count == 0:
+            all_predict_prob = batch_predict_prob
+        else:
+            all_predict_prob = np.concatenate([all_predict_prob, batch_predict_prob])
+        count = 1
 
     # Evaluation indexes
     y_test = np.argmax(y_test, axis=1)
@@ -229,8 +237,9 @@ def test():
     print("Confusion Matrix ...")
     print(metrics.confusion_matrix(y_test, all_predictions))
 
-    print("Saving evaluation to {0}".format(FLAGS.save_dir))
-    with open(FLAGS.save_dir, 'w') as f:
+    out_dir = os.path.join(FLAGS.save_dir, 'predict_prob.csv')
+    print("Saving evaluation to {0}".format(out_dir))
+    with open(out_dir, 'w') as f:
         csv.writer(f).writerows(all_predict_prob)
 
     time_dif = get_time_dif(start_time)
