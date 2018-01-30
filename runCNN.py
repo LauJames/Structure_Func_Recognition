@@ -19,15 +19,18 @@ import time
 import datetime
 import numpy as np
 import tensorflow as tf
+import csv
 from sklearn import metrics
 from model.CNNmodel import TextCNN
 import data.dataHelper as dataHelper
 
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.05, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data",
-                       "Data source for the  data.")
+tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("train_data_file", "./data/paragraph3000",
+                       "Data source for the train data.")
+tf.flags.DEFINE_string("test_data_file", "./data/paragraph1000",
+                       "Data source for the test data.")
 tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN", "saving path of tensorboard")
 tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN", "save base dir")
 
@@ -122,7 +125,7 @@ def train():
     # Load data
     print("Loading data...")
     start_time = time.time()
-    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
+    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
@@ -145,7 +148,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 10000  # 如果超过1000论未提升，提前结束训练
+    require_imporvement = 15000  # 如果超过15000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
@@ -193,7 +196,7 @@ def train():
 def test():
     print("Loading test data ...")
     start_time = time.time()
-    x_raw, y_test = dataHelper.get_para_label(FLAGS.data_file)
+    x_raw, y_test = dataHelper.get_para_label(FLAGS.test_data_file)
     # y_test = np.argmax(y_test, axis=1)
     vocab_path = os.path.join(FLAGS.save_dir, "vocab")
     vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(vocab_path)
@@ -210,10 +213,12 @@ def test():
 
     x_test_batches = dataHelper.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
     all_predictions = []
+    all_predict_prob = []
     for x_test_batch in x_test_batches:
-        batch_predictions = session.run(model.y_pred, feed_dict={model.input_x: x_test_batch,
-                                                                 model.dropout_keep_prob: 1.0})
+        batch_predictions, batch_predict_prob = session.run(model.y_pred, model.scores, feed_dict={
+            model.input_x: x_test_batch, model.dropout_keep_prob: 1.0})
         all_predictions = np.concatenate([all_predictions, batch_predictions])
+        all_predict_prob = np.concatenate([all_predict_prob, batch_predict_prob])
 
     # Evaluation indexes
     y_test = np.argmax(y_test, axis=1)
@@ -223,6 +228,10 @@ def test():
     # Confusion Matrix
     print("Confusion Matrix ...")
     print(metrics.confusion_matrix(y_test, all_predictions))
+
+    print("Saving evaluation to {0}".format(FLAGS.save_dir))
+    with open(FLAGS.save_dir, 'w') as f:
+        csv.writer(f).writerows(all_predict_prob)
 
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
