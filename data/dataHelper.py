@@ -17,6 +17,7 @@ import re
 import codecs
 import tensorflow as tf
 import os
+from sklearn.model_selection import train_test_split
 
 
 def clean_str(string):
@@ -130,10 +131,14 @@ def load_data(data_file, dev_sample_percentage, save_vocab_dir):
     y_shuffled = y[shuffle_indices]
 
     # Split train/test set
-    # TODO: This is very crude, should use cross-validation
-    dev_sample_index = -1 * int(dev_sample_percentage * float(len(y)))
-    x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-    y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+    # TODO: use k-fold cross validation
+
+    # old methods
+    # dev_sample_index = -1 * int(dev_sample_percentage * float(len(y)))
+    # x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+    # y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+
+    x_train, x_dev, y_train, y_dev = train_test_split(x_shuffled, y_shuffled, test_size=dev_sample_percentage)
 
     del x, y, x_shuffled, y_shuffled
 
