@@ -18,19 +18,22 @@ import time
 import datetime
 import numpy as np
 import tensorflow as tf
+import csv
 from sklearn import metrics
 from model.CLSTMmodel import CLSTM
 from data import dataHelper
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.01, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data",
-                       "Data source for the  data.")
-tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/CLSTM", "saving path of tensorboard")
-tf.flags.DEFINE_string("save_dir", "checkpoints/CLSTM", "save base dir")
+tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("train_data_file", "./data/paragraph3000",
+                       "Data source for the train data.")
+tf.flags.DEFINE_string("test_data_file", "./data/paragraph1000",
+                       "Data source for the test data.")
+tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCLSTM", "saving path of tensorboard")
+tf.flags.DEFINE_string("save_dir", "checkpoints/textCLSTM", "save base dir")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
@@ -209,10 +212,20 @@ def test():
 
     x_test_batches = dataHelper.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
     all_predictions = []
+    all_predict_prob = []
+    count = 0  # concatenate第一次不能为空，需要加个判断来赋all_predict_prob值
     for x_test_batch in x_test_batches:
-        batch_predictions = session.run(model.y_pred, feed_dict={model.input_x: x_test_batch,
-                                                                 model.dropout_keep_prob: 1.0})
+        batch_predictions, batch_predict_prob = session.run([model.y_pred, model.prob],
+                                                            feed_dict={
+                                                                model.input_x: x_test_batch,
+                                                                model.dropout_keep_prob: 1.0
+                                                            })
         all_predictions = np.concatenate([all_predictions, batch_predictions])
+        if count == 0:
+            all_predict_prob = batch_predict_prob
+        else:
+            all_predict_prob = np.concatenate([all_predict_prob, batch_predict_prob])
+        count = 1
 
     # Evaluation indexes
     y_test = np.argmax(y_test, axis=1)
@@ -222,6 +235,11 @@ def test():
     # Confusion Matrix
     print("Confusion Matrix ...")
     print(metrics.confusion_matrix(y_test, all_predictions))
+
+    out_dir = os.path.join(FLAGS.save_dir, 'predict_prob.csv')
+    print("Saving evaluation to {0}".format(out_dir))
+    with open(out_dir, 'w') as f:
+        csv.writer(f).writerows(all_predict_prob)
 
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)

@@ -102,8 +102,10 @@ class CLSTM(object):
 
             # classfier
             self.logits = tf.layers.dense(fc, num_classes, name='fc2')
+            # probability
+            self.prob = tf.nn.softmax(self.logits)
             # prediction
-            self.y_pred = tf.argmax(tf.nn.softmax(self.logits), 1)
+            self.y_pred = tf.argmax(self.prob, 1)
 
         with tf.name_scope('loss'):
             # loss
