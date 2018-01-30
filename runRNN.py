@@ -20,7 +20,7 @@ import numpy as np
 import tensorflow as tf
 import csv
 from sklearn import metrics
-from model.textRNN_new import TextRnnNew
+from model.RNNmodel import TextRnnNew
 from data import dataHelper
 
 # Data loading params
@@ -232,7 +232,7 @@ def test():
     print("Saving evaluation to {0}".format(out_dir))
     with open(out_dir, 'w') as f:
         csv.writer(f).writerows(all_predict_prob)
-        
+
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 

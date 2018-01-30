@@ -6,7 +6,7 @@
 @Author   : Lau James
 @Contact  : LauJames2017@whu.edu.cn
 @Project  : Structure_Func_Recognition 
-@File     : textRNN_new.py
+@File     : RNNmodel.py
 @Time     : 2018/1/23 15:55
 @Software : PyCharm
 @Copyright: "Copyright (c) 2017 Lau James. All Rights Reserved"
