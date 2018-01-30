@@ -33,7 +33,7 @@ class CLSTM(object):
         with tf.device('/cpu:0'), tf.name_scope('embedding'):
             self.W = tf.Variable(tf.random_uniform([vocab_size, embedding_dim], -1.0, 1.0), name='W')
             self.embeded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
-            self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
+            self.embedded_chars_expanded = tf.expand_dims(self.embeded_chars, -1)
 
         with tf.name_scope('cnn'):
             # CNN layer
@@ -70,7 +70,7 @@ class CLSTM(object):
                     # pooled_reshape = pooled_reshape[:, :max_feature_length, :]
                     pooled_outputs.append(pooled_reshape)
             # Concatenate the outputs from different filters
-            if len(len(filter_sizes)) > 1:
+            if len(filter_sizes) > 1:
                 rnn_inputs = tf.concat(pooled_outputs, -1)
             else:
                 rnn_inputs = pooled_reshape
