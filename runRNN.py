@@ -47,7 +47,7 @@ tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer("evaluate_every", 250, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 
@@ -138,7 +138,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 10000  # 如果超过1000论未提升，提前结束训练
+    require_imporvement = 30000  # 如果超过1000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
