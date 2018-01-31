@@ -40,7 +40,7 @@ tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
-tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
+tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
@@ -48,7 +48,7 @@ tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer("evaluate_every", 250, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 
@@ -148,7 +148,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 15000  # 如果超过15000论未提升，提前结束训练
+    require_imporvement = 30000  # 如果超过30000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
