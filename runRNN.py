@@ -124,7 +124,7 @@ def train():
     # Load data
     print("Loading data...")
     start_time = time.time()
-    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
+    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
@@ -186,7 +186,7 @@ def train():
 def test():
     print("Loading test data ...")
     start_time = time.time()
-    x_raw, y_test = dataHelper.get_para_label(FLAGS.data_file)
+    x_raw, y_test = dataHelper.get_para_label(FLAGS.test_data_file)
     # y_test = np.argmax(y_test, axis=1)
     vocab_path = os.path.join(FLAGS.save_dir, "vocab")
     vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(vocab_path)
