@@ -42,12 +42,12 @@ tf.flags.DEFINE_integer("num_layers", 2, "number of layers (default: 2)")
 tf.flags.DEFINE_integer("hidden_dim", 128, "neural numbers of hidden layer (default: 128)")
 tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
-tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
+tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer("evaluate_every", 250, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 
@@ -147,7 +147,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 15000  # 如果超过15000论未提升，提前结束训练
+    require_imporvement = 30000  # 如果超过30000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
@@ -230,7 +230,7 @@ def test():
     # Evaluation indexes
     y_test = np.argmax(y_test, axis=1)
     print("Precision, Recall, F1-Score ...")
-    print(metrics.classification_report(y_test, all_predictions, target_names=['Introduction', 'Relaterd work',
+    print(metrics.classification_report(y_test, all_predictions, target_names=['Introduction', 'Related work',
                                                                                'Methods', 'Experiment', 'Conclusion']))
     # Confusion Matrix
     print("Confusion Matrix ...")
