@@ -27,16 +27,16 @@ import data.dataHelper as dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("train_data_file", "./data/header3000.txt",
+tf.flags.DEFINE_string("train_data_file", "./data/paragraph3000",
                        "Data source for the train data.")
-tf.flags.DEFINE_string("test_data_file", "./data/header1000.txt",
+tf.flags.DEFINE_string("test_data_file", "./data/paragraph1000",
                        "Data source for the test data.")
 tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN_header", "saving path of tensorboard")
 tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN_header", "save base dir")
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("vocab_size", 500, "vocabulary size (default: 5000)")
+tf.flags.DEFINE_integer("vocab_size", 8000, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_integer("seq_length", 15, "sequence length (default: 600)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")

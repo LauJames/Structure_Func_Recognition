@@ -110,10 +110,10 @@ def get_header(file_path):
             line = fp.readline()
             if not line:
                 print("Data loaded successfully!")
-                headers = [clean_str(header) for header in headers]
+                headers = [clean_str(str(header)) for header in headers]
                 return [headers, np.array(labels)]
-            tmp = line.strip().split('\t')[-2:]
-            header, label = tmp[0], int(tmp[1])
+            tmp = line.strip().split('\t')[-4:]
+            header, label = tmp[0], int(tmp[2])
             if label == 1:
                 labels.append([1, 0, 0, 0, 0])
             elif label == 2:
