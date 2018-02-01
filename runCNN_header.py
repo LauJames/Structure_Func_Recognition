@@ -27,9 +27,9 @@ import data.dataHelper as dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("train_data_file", "./data/header3000",
+tf.flags.DEFINE_string("train_data_file", "./data/header3000.txt",
                        "Data source for the train data.")
-tf.flags.DEFINE_string("test_data_file", "./data/header1000",
+tf.flags.DEFINE_string("test_data_file", "./data/header1000.txt",
                        "Data source for the test data.")
 tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN_header", "saving path of tensorboard")
 tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN_header", "save base dir")
