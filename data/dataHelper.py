@@ -113,7 +113,7 @@ def get_header(file_path):
                 headers = [clean_str(header) for header in headers]
                 return [headers, np.array(labels)]
             tmp = line.strip().split('\t')[-2:]
-            header, label = int(tmp[0]), tmp[1]
+            header, label = tmp[0], int(tmp[1])
             if label == 1:
                 labels.append([1, 0, 0, 0, 0])
             elif label == 2:
