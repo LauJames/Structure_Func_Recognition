@@ -142,12 +142,12 @@ def batch_iter_eval(x, y, batch_size=32):
         yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]
 
 
-def load_header_data(data_file, dev_sample_percentage, save_vocab_dir):
+def load_header_data(data_file, dev_sample_percentage, save_vocab_dir, max_length):
     x_text, y = get_header(data_file)
 
     # Build vocabulary
     # max_document_length = max([len(x.split(" ")) for x in x_text])
-    vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_document_length=15)
+    vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_document_length=max_length)
     # 神器，填充到最大长度
     x = np.array(list(vocab_processor.fit_transform(x_text)))
 
