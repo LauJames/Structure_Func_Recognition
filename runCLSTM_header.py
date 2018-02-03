@@ -124,7 +124,7 @@ def train():
     # Load data
     print("Loading data...")
     start_time = time.time()
-    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir, FLAGS.seq_length)
+    x_train, y_train, x_dev, y_dev = dataHelper.load_header_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir, FLAGS.seq_length)
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
@@ -147,7 +147,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 15000  # 如果超过15000论未提升，提前结束训练
+    require_imporvement = 15000  # 如果超过30000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
