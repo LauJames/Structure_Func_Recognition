@@ -148,7 +148,7 @@ def train():
     total_batch = 0  # 总批次
     best_acc_dev = 0.0  # 最佳验证集准确率
     last_improved = 0  # 记录上一次提升批次
-    require_imporvement = 20000  # 如果超过20000论未提升，提前结束训练
+    require_imporvement = 15000  # 如果超过15000论未提升，提前结束训练
 
     tag = False
     for epoch in range(FLAGS.num_epochs):
