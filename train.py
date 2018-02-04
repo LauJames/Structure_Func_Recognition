@@ -21,8 +21,8 @@ import datetime
 from model.textCNN import TextCNN
 
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", 0.05, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/labeled_data",
+tf.flags.DEFINE_float("dev_sample_percentage", 0.0, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("data_file", "./data/paragrahp3500",
                        "Data source for the  data.")
 
 # Model Hyperparameters

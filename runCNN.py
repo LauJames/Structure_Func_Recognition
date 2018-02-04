@@ -36,7 +36,7 @@ tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN_para", "save base dir")
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("vocab_size", 103505, "vocabulary size (default: 5000)")
+tf.flags.DEFINE_integer("vocab_size", 119368, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_integer("seq_length", 600, "sequence length (default: 600)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
