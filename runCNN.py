@@ -27,12 +27,12 @@ import data.dataHelper as dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("train_data_file", "./data/paragraph3000",
+tf.flags.DEFINE_string("train_data_file", "./data/paragrahp3500",
                        "Data source for the train data.")
-tf.flags.DEFINE_string("test_data_file", "./data/paragraph1000",
+tf.flags.DEFINE_string("test_data_file", "./data/paragraph500",
                        "Data source for the test data.")
-tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN", "saving path of tensorboard")
-tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN", "save base dir")
+tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/textCNN_para", "saving path of tensorboard")
+tf.flags.DEFINE_string("save_dir", "checkpoints/textCNN_para", "save base dir")
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
@@ -47,7 +47,7 @@ tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
@@ -125,7 +125,7 @@ def train():
     # Load data
     print("Loading data...")
     start_time = time.time()
-    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
+    x_train, y_train, x_dev, y_dev = dataHelper.load_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir, FLAGS.seq_length)
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
