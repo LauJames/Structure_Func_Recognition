@@ -124,7 +124,7 @@ def train():
     # Load data
     print("Loading data...")
     start_time = time.time()
-    x_train, y_train, x_dev, y_dev = dataHelper.load_header_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir)
+    x_train, y_train, x_dev, y_dev = dataHelper.load_header_data(FLAGS.train_data_file, FLAGS.dev_sample_percentage, FLAGS.save_dir, FLAGS.seq_length)
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
