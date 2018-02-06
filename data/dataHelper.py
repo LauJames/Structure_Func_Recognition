@@ -127,6 +127,36 @@ def get_header(file_path):
             headers.append(header)
 
 
+def get_section(file_path):
+    """
+    load header data from files, splits the data into words and labels
+    :param file_path:
+    :return: headers, labels
+    """
+    sections = []
+    labels = []
+    with codecs.open(file_path, encoding='utf-8') as fp:
+        while True:
+            line = fp.readline()
+            if not line:
+                print("Data loaded successfully!")
+                sections = [clean_str(str(section)) for section in sections]
+                return [sections, np.array(labels)]
+            tmp = line.strip().split('\t')[-2:]
+            label, section = int(tmp[0]), tmp[1]
+            if label == 1:
+                labels.append([1, 0, 0, 0, 0])
+            elif label == 2:
+                labels.append([0, 1, 0, 0, 0])
+            elif label == 3:
+                labels.append([0, 0, 1, 0, 0])
+            elif label == 4:
+                labels.append([0, 0, 0, 1, 0])
+            else:
+                labels.append([0, 0, 0, 0, 1])
+            sections.append(section)
+
+
 def batch_iter_eval(x, y, batch_size=32):
     """生成随机批次数据"""
     data_len = len(x)
@@ -144,6 +174,31 @@ def batch_iter_eval(x, y, batch_size=32):
 
 def load_header_data(data_file, dev_sample_percentage, save_vocab_dir, max_length):
     x_text, y = get_header(data_file)
+
+    # Build vocabulary
+    # max_document_length = max([len(x.split(" ")) for x in x_text])
+    vocab_processor = tf.contrib.learn.preprocessing.VocabularyProcessor(max_document_length=max_length)
+    # 神器，填充到最大长度
+    x = np.array(list(vocab_processor.fit_transform(x_text)))
+
+    # Write vocabulary
+    vocab_processor.save(os.path.join(save_vocab_dir, "vocab"))
+
+    # Randomly shuffle data
+
+    # Split train/test set
+    # TODO: use k-fold cross validation
+    x_train, x_dev, y_train, y_dev = train_test_split(x, y, test_size=dev_sample_percentage, random_state=22)
+
+    del x, y
+
+    print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+    print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+    return x_train, y_train, x_dev, y_dev
+
+
+def load_section_data(data_file, dev_sample_percentage, save_vocab_dir, max_length):
+    x_text, y = get_section(data_file)
 
     # Build vocabulary
     # max_document_length = max([len(x.split(" ")) for x in x_text])
