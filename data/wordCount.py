@@ -43,7 +43,7 @@ def clean_str(string):
 
 
 def contentlength():
-    with open("section500", 'r', encoding='utf-8') as f:
+    with open("section3500", 'r', encoding='utf-8') as f:
         lenList = []
         for line in f:
             # do something with the line

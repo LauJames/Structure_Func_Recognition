@@ -35,7 +35,7 @@ tf.flags.DEFINE_string("save_dir", "checkpoints/textCLSTM_section", "save base d
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("seq_length", 10000, "sequence length (default: 600)")
+tf.flags.DEFINE_integer("seq_length", 5000, "sequence length (default: 600)")
 tf.flags.DEFINE_integer("vocab_size", 119396, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.8, "Dropout keep probability (default: 0.5)")
@@ -46,7 +46,7 @@ tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (d
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
