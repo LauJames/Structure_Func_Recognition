@@ -45,7 +45,7 @@ tf.flags.DEFINE_string("rnn_type", 'lstm', "rnn type (default: gru)")
 tf.flags.DEFINE_float("learning_rate", 1e-3, "learning rate (default:1e-3)")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 8, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
