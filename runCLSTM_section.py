@@ -46,7 +46,7 @@ tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (d
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 16, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 8, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 500, "Save model after this many steps (default: 100)")
