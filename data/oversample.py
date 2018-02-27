@@ -81,7 +81,7 @@ def oversample(file_path):
             if flag:
                 x_resampled.append(x[index_cnt][:])
                 x_class_present.append(x[index_cnt][:])
-                index_cnt += 1
+            index_cnt += 1
         oversample_class = []
         for sampleIndex in indx:
             x_resampled.append(x_class_present[sampleIndex][:])
