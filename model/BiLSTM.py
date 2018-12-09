@@ -7,7 +7,7 @@ class BiLSTM(object):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name='input_x')
-        self.input_y = tf.placeholder(tf.float32, [None, num_classes], name='input_y')
+        self.input_y = tf.placeholder(tf.int64, [None, num_classes], name='input_y')
         self.dropout_keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
         # Embedding layer 指定在cpu
@@ -18,44 +18,55 @@ class BiLSTM(object):
         # bilstm
         #含有dropout的lstm cell
         def lstm_cell_dropout():
-            cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_dim, state_is_tuple=True)
-            return cell
-            # cell = tf.contrib.rnn.BasicLSTMCell(hidden_dim, state_is_tuple=True)
-            # return tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=self.dropout_keep_prob)
+            # cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_dim, state_is_tuple=True)
+            # return cell
+            cell = tf.contrib.rnn.BasicLSTMCell(hidden_dim, state_is_tuple=True)
+            return tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=self.dropout_keep_prob)
 
         with tf.name_scope('bi_lstm'):
             #建立前后多向层cells
-            cells_fw = tf.nn.rnn_cell.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
-            cells_bw = tf.nn.rnn_cell.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
-            # cells_fw = tf.contrib.rnn.MultiRNNCell([lstm_cell_dropout() for _  in range(num_layers)], state_is_tuple=True)
-            # cells_bw = tf.contrib.rnn.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
+            # cells_fw = tf.nn.rnn_cell.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
+            # cells_bw = tf.nn.rnn_cell.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
+            cells_fw = tf.contrib.rnn.MultiRNNCell([lstm_cell_dropout() for _  in range(num_layers)], state_is_tuple=True)
+            cells_bw = tf.contrib.rnn.MultiRNNCell([lstm_cell_dropout() for _ in range(num_layers)], state_is_tuple=True)
 
             _outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cells_fw, cell_bw=cells_bw, inputs=self.embeded_chars, dtype=tf.float32)
-            # 取最后一个时序作为结果
-            last = _outputs[:, -1, :]
+
+            # 前向的最后一个时序结果
+            # self.output_fw_last = _outputs[0][:, -1, :]
+            # 后向的最后一个时序结果
+            # self.output_bw_last = _outputs[1][:, -1, :]
+            # last = tf.concat([self.output_fw_last, self.output_bw_last], 1)
+
+            # temp = tf.concat(_outputs, 2)
+            # last = temp[:, -1, :]
+            last = tf.concat(_outputs, 2)[:, -1, :]
+
 
         with tf.name_scope('score'):
             #relu 激活层
-            fc = tf.layers.dense(input=last, units=hidden_dim, name='fc1' )
+            fc = tf.layers.dense(inputs=last, units=hidden_dim, name='fc1')
             fc = tf.nn.dropout(fc, keep_prob=self.dropout_keep_prob)
-            fc =tf.nn.relu(fc)
+            self.fc = tf.nn.relu(fc)
 
             #classifier
-            self.logits = tf.layers.dense(input=fc, units=num_classes, name='fc2')
+            self.logits = tf.layers.dense(inputs=self.fc, units=num_classes, name='fc2')
             #probability
             self.prob = tf.nn.softmax(self.logits)
             #prediction softmax的结果是m*num_classes 所以取X方向的最大值，即某一样本的中的最大值
-            self.y_pred = tf.arg_max(self.prob,1)
+            self.y_pred = tf.arg_max(self.prob, 1)
 
         with tf.name_scope('loss'):
-            cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits + 1e-10, labels=self.input_y)
-            self.loss = tf.reduce_mean(cross_entropy)
+            # self.cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits + 1e-8, labels=self.input_y)
+            self.cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits + 1e-5, labels=self.input_y)
+            self.loss = tf.reduce_mean(self.cross_entropy)
             #optimizer
             self.optimizer = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
 
         with tf.name_scope('accuracy'):
-            correct_predictions = tf.equal(self.y_pred, self.input_y)
-            self.accuracy = tf.reduce_mean(tf.case(correct_predictions, tf.float32))
+            # correct_predictions = tf.equal(self.y_pred, self.input_y)
+            correct_predictions = tf.equal(self.y_pred, tf.argmax(self.input_y, 1))
+            self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 
 

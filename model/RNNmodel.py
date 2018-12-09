@@ -83,8 +83,8 @@ class TextRnnNew(object):
 
         with tf.name_scope('loss'):
             # loss
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.input_y)
-            self.loss = tf.reduce_mean(cross_entropy)
+            self.cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.input_y)
+            self.loss = tf.reduce_mean(self.cross_entropy)
             # optimizer
             self.optim = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
 

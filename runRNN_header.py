@@ -56,7 +56,8 @@ tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device 
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
 FLAGS = tf.flags.FLAGS
-FLAGS._parse_flags()
+# FLAGS._parse_flags()
+FLAGS.flag_values_dict()
 save_path = os.path.join(FLAGS.save_dir, 'best_validation')
 
 
@@ -154,7 +155,7 @@ def train():
             if total_batch % FLAGS.evaluate_every == 0:
                 # print performance on train set and dev set
                 feed_dict[model.dropout_keep_prob] = 1.0
-                loss_train, acc_train = session.run([model.loss, model.accuracy], feed_dict=feed_dict)
+                loss_train, acc_train, logits, cross_entropy = session.run([model.loss, model.accuracy, model.logits, model.cross_entropy], feed_dict=feed_dict)
                 loss_dev, acc_dev = evaluate(x_dev, y_dev, session)
 
                 if acc_dev > best_acc_dev:
@@ -183,7 +184,7 @@ def train():
             break
 
 
-def test():
+def predict():
     print("Loading test data ...")
     start_time = time.time()
     x_raw, y_test = dataHelper.get_header(FLAGS.test_data_file)
@@ -238,13 +239,13 @@ def test():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-        raise ValueError("Please input: python3 runRNN_header.py [train/test]")
-
-    print("\nParameters:")
-    for attr, value in sorted(FLAGS.__flags.items()):
-        print("{}={}".format(attr.upper(), value))
-    print("")
+    # if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+    #     raise ValueError("Please input: python3 runRNN_header.py [train/test]")
+    #
+    # print("\nParameters:")
+    # for attr, value in sorted(FLAGS.__flags.items()):
+    #     print("{}={}".format(attr.upper(), value))
+    # print("")
 
     model = TextRnnNew(
         sequence_length=FLAGS.seq_length,
@@ -256,7 +257,8 @@ if __name__ == '__main__':
         rnn=FLAGS.rnn_type,
         learning_rate=FLAGS.learning_rate
     )
-    if sys.argv[1] == 'train':
-        train()
-    else:
-        test()
+    # if sys.argv[1] == 'train':
+    #     train()
+    # else:
+    #     predict()
+    train()
