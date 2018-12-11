@@ -242,8 +242,8 @@ if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
          raise ValueError("Please input: python3 runRNN_header.py [train/test]")
     print("\nParameters:")
-    for attr, value in sorted(FLAGS.__flags.items()):
-         print("{}={}".format(attr.upper(), value))
+    for key in sorted(FLAGS.__flags.keys()):
+        print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
     print("")
 
     model = TextRnnNew(
