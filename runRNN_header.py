@@ -184,7 +184,7 @@ def train():
             break
 
 
-def predict():
+def test():
     print("Loading test data ...")
     start_time = time.time()
     x_raw, y_test = dataHelper.get_header(FLAGS.test_data_file)
@@ -239,13 +239,12 @@ def predict():
 
 
 if __name__ == '__main__':
-    # if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-    #     raise ValueError("Please input: python3 runRNN_header.py [train/test]")
-    #
-    # print("\nParameters:")
-    # for attr, value in sorted(FLAGS.__flags.items()):
-    #     print("{}={}".format(attr.upper(), value))
-    # print("")
+    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+         raise ValueError("Please input: python3 runRNN_header.py [train/test]")
+    print("\nParameters:")
+    for attr, value in sorted(FLAGS.__flags.items()):
+         print("{}={}".format(attr.upper(), value))
+    print("")
 
     model = TextRnnNew(
         sequence_length=FLAGS.seq_length,
@@ -257,8 +256,7 @@ if __name__ == '__main__':
         rnn=FLAGS.rnn_type,
         learning_rate=FLAGS.learning_rate
     )
-    # if sys.argv[1] == 'train':
-    #     train()
-    # else:
-    #     predict()
-    train()
+    if sys.argv[1] == 'train':
+        train()
+    else:
+         test()

@@ -23,7 +23,7 @@ tf.flags.DEFINE_string(name='train_file_path', default='./data/header3500',
                        help='data source for the train data')
 tf.flags.DEFINE_string(name='test_file_path', default='./data/header500',
                        help='data source for the test data')
-tf.flags.DEFINE_string(name='save_dir', default='./checkpoints/save',
+tf.flags.DEFINE_string(name='save_dir', default='checkpoints/LSTM_header',
                        help='save base dir')
 tf.flags.DEFINE_float(name='dev_percentage', default=0.1, help='percentage of validation set ')
 # tf.flags.DEFINE_integer(name='vector_max_length', default=15, help='length of vocabulary vector')
