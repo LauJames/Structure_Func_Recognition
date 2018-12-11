@@ -25,7 +25,7 @@ from data import dataHelper
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("train_data_file", "./data/paragrahp3500",
+tf.flags.DEFINE_string("train_data_file", "./data/paragraph3500",
                        "Data source for the train data.")
 tf.flags.DEFINE_string("test_data_file", "./data/paragraph500",
                        "Data source for the test data.")
