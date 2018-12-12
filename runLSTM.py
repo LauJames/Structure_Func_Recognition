@@ -222,8 +222,8 @@ if __name__ == '__main__':
         raise ValueError("Please input: python3 runLSTM.py [train/test]")
 
     print("\nParameters:")
-    for attr, value in sorted(FLAGS.__flags.items()):
-        print("{}={}".format(attr.upper(), value))
+    for key in sorted(FLAGS.__flags.keys()):
+        print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
     print("")
     model = BiLSTM(sequence_length=FLAGS.sequence_length,
                    num_classes=FLAGS.num_classes,

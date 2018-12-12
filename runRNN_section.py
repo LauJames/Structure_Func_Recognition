@@ -243,8 +243,8 @@ if __name__ == '__main__':
         raise ValueError("Please input: python3 runRNN_section.py [train/test]")
 
     print("\nParameters:")
-    for attr, value in sorted(FLAGS.__flags.items()):
-        print("{}={}".format(attr.upper(), value))
+    for key in sorted(FLAGS.__flags.keys()):
+        print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
     print("")
 
     model = TextRnnNew(
