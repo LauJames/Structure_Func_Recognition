@@ -53,8 +53,18 @@ def get_header_file(file_path):
             # line = '10.1016/j.compgeo.2012.01.008	 Introduction	1'
             tmp = line.strip().split('\t')[-2:]
             header, label = tmp[0], int(tmp[1])
+            if label == 1:
+                y_labels.append([1, 0, 0, 0, 0])
+            elif label == 2:
+                y_labels.append([0, 1, 0, 0, 0])
+            elif label == 3:
+                y_labels.append([0, 0, 1, 0, 0])
+            elif label == 4:
+                y_labels.append([0, 0, 0, 1, 0])
+            else:
+                y_labels.append([0, 0, 0, 0, 1])
             x_headers.append(header)
-            y_labels.append(label)
+            # y_labels.append(label)
 
 
 def get_section_file(file_path):
@@ -73,9 +83,20 @@ def get_section_file(file_path):
                 sections = [clean_str(str(section)) for section in sections]
                 return [sections, np.array(labels)]
             tmp = line.strip().split('\t')[-2:]
+            # label, section = int(tmp[0]), tmp[1]
             label, section = int(tmp[0]), tmp[1]
             sections.append(section)
-            labels.append(label)
+            if label == 1:
+                labels.append([1, 0, 0, 0, 0])
+            elif label == 2:
+                labels.append([0, 1, 0, 0, 0])
+            elif label == 3:
+                labels.append([0, 0, 1, 0, 0])
+            elif label == 4:
+                labels.append([0, 0, 0, 1, 0])
+            else:
+                labels.append([0, 0, 0, 0, 1])
+            # labels.append(label)
 
 
 def get_paragraph_file(file_path):
@@ -93,8 +114,19 @@ def get_paragraph_file(file_path):
                 paras = [clean_str(paragraph) for paragraph in paras]
                 return [paras, np.array(labels)]
             tmp = line.strip().split('\t')[-2:]
+            # label, para = int(tmp[0]), tmp[1]
             label, para = int(tmp[0]), tmp[1]
-            labels.append(label)
+            if label == 1:
+                labels.append([1, 0, 0, 0, 0])
+            elif label == 2:
+                labels.append([0, 1, 0, 0, 0])
+            elif label == 3:
+                labels.append([0, 0, 1, 0, 0])
+            elif label == 4:
+                labels.append([0, 0, 0, 1, 0])
+            else:
+                labels.append([0, 0, 0, 0, 1])
+            # labels.append(label)
             paras.append(para)
 
 

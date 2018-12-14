@@ -239,13 +239,13 @@ def test():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
-         raise ValueError("Please input: python3 runRNN_header.py [train/test]")
-    print("\nParameters:")
-    for key in sorted(FLAGS.__flags.keys()):
-        print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
-    print("")
-
+    # if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+    #      raise ValueError("Please input: python3 runRNN_header.py [train/test]")
+    # print("\nParameters:")
+    # for key in sorted(FLAGS.__flags.keys()):
+    #     print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
+    # print("")
+    #
     model = TextRnnNew(
         sequence_length=FLAGS.seq_length,
         num_classes=FLAGS.num_classes,
@@ -256,7 +256,8 @@ if __name__ == '__main__':
         rnn=FLAGS.rnn_type,
         learning_rate=FLAGS.learning_rate
     )
-    if sys.argv[1] == 'train':
-        train()
-    else:
-         test()
+    # if sys.argv[1] == 'train':
+    #     train()
+    # else:
+    #      test()
+    test()

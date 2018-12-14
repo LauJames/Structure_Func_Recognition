@@ -41,7 +41,7 @@ tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.8, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_integer("num_layers", 2, "number of layers (default: 2)")
 tf.flags.DEFINE_integer("hidden_dim", 128, "neural numbers of hidden layer (default: 128)")
-tf.flags.DEFINE_float("learning_rate", 0.001, "learning rate (default:1e-3)")
+tf.flags.DEFINE_float("learning_rate", 0.00005, "learning rate (default:1e-3)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 
