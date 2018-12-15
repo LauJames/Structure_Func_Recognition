@@ -14,21 +14,25 @@
 
 import  numpy as np
 import os
+import sys
 from sklearn import svm
 from sklearn.metrics import classification_report, confusion_matrix
 from data import dataLoader_dt
 from data import wordList
+base_dir = os.getcwd()
+header_data_file_dir = base_dir+'/data/header500'
+header_data_test_file_dir = base_dir+'/data/test_header'
+header_all_data_path =base_dir+ '/data/header'
 
-header_data_file_dir = './data/header3500'
-header_data_test_file_dir = './data/header500'
-header_all_data_path = './data/header'
-section_data_file_dir = './data/section3500'
-section_data_test_file_dir = './data/section500'
-paragraph_data_file_dir = './data/paragraph3500'
-paragraph_data_test_file_dir = './data/paragraph500'
+section_data_file_dir = base_dir+'/data/section3500'
+section_data_test_file_dir = base_dir+'/data/section500'
+section_all_data_path =base_dir+ '/data/section'
 
-save_train_vacab_dir = './SVM/save/train'
-save_test_vacab_dir = './SVM/save/test'
+paragraph_data_file_dir = base_dir+'/data/paragraph3500'
+paragraph_data_test_file_dir = base_dir+'/data/paragraph500'
+paragraph_all_data_path =base_dir+ '/data/paragraph'
+save_train_vacab_dir = base_dir+'/SVM/save/train'
+save_test_vacab_dir = base_dir+'/SVM/save/test'
 
 if not os.path.exists(save_train_vacab_dir):
     os.makedirs(save_train_vacab_dir)
@@ -39,8 +43,8 @@ if not os.path.exists(save_test_vacab_dir):
 def svm_header():
     print('SVM decision for header...')
 
-    x_header_train, y_header_train = wordList.para2id_header(header_data_file_dir, header_all_data_path, 128)
-    x_header_test, y_header_test = wordList.para2id_header(header_data_test_file_dir, header_all_data_path, 128)
+    x_header_train, y_header_train = wordList.para2id_header(header_data_file_dir, header_all_data_path, 10)
+    x_header_test, y_header_test = wordList.para2id_header(header_data_test_file_dir, header_all_data_path, 10)
 
     # 处理y
     y_header_train = np.argmax(y_header_train, 1)
@@ -75,10 +79,8 @@ def svm_header():
 
 def svm_section():
     print('SVM decision for section...')
-    x_section_train, y_section_train, _, _ = dataLoader_dt.load_paragraph_data(section_data_file_dir, save_train_vacab_dir, 0,
-                                                                          2500)
-    x_section_test, y_section_test, _, _ = dataLoader_dt.load_paragraph_data(section_data_test_file_dir, save_test_vacab_dir, 0,
-                                                                          2500)
+    x_section_train, y_section_train = wordList.para2id(section_data_file_dir, section_all_data_path,600)
+    x_section_test, y_section_test = wordList.para2id(section_data_test_file_dir, section_all_data_path,600)
     # x_header_test, y_header_test, x_header_train, y_header_train = dataLoader_dt.load_header_data(header_data_file_dir, save_test_vacab_dir,
     #                                                                     0.9, 15)
     # 处理y
@@ -114,10 +116,8 @@ def svm_section():
 
 def svm_paragraph():
     print('SVM decision for paragraph...')
-    x_para_train, y_para_train, _, _ = dataLoader_dt.load_paragraph_data(paragraph_data_file_dir, save_train_vacab_dir, 0,
-                                                                          600)
-    x_para_test, y_para_test, _, _ = dataLoader_dt.load_paragraph_data(paragraph_data_test_file_dir, save_test_vacab_dir, 0,
-                                                                          600)
+    x_para_train, y_para_train = wordList.para2id(paragraph_data_file_dir, paragraph_all_data_path, 600)
+    x_para_test, y_para_test = wordList.para2id(paragraph_data_test_file_dir, paragraph_all_data_path, 600)
     # x_para_test, y_para_test, x_para_train, y_para_train = dataLoader_dt.load_paragraph_data(paragraph_data_test_file_dir,
     #                                                                                       save_test_vacab_dir, 0.9, 600)
     # 处理y
@@ -151,5 +151,16 @@ def svm_paragraph():
     print(confusion_matrix(y_para_test, y_pred))
 
 if __name__ == '__main__':
-    svm_header()
+    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+        raise ValueError("Please input: python3 runLSTM.py [train/test]")
+    if sys.argv[1] == 'header':
+        svm_header()
+    elif sys.argv[1] == 'section':
+        svm_section()
+    else:
+        svm_paragraph()
+
+    # print(os.getcwd()+'/data/header3500')
+    # print(os.path.abspath(__file__))
+    # svm_header()
     # svm_paragraph()
