@@ -14,6 +14,7 @@
 
 import  numpy as np
 import os
+import sys
 from sklearn import svm
 from sklearn.metrics import classification_report, confusion_matrix
 from data import dataLoader_dt
@@ -150,7 +151,16 @@ def svm_paragraph():
     print(confusion_matrix(y_para_test, y_pred))
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
+        raise ValueError("Please input: python3 runLSTM.py [train/test]")
+    if sys.argv[1] == 'header':
+        svm_header()
+    elif sys.argv[1] == 'section':
+        svm_section()
+    else:
+        svm_paragraph()
+
     # print(os.getcwd()+'/data/header3500')
     # print(os.path.abspath(__file__))
     # svm_header()
-    svm_paragraph()
+    # svm_paragraph()
