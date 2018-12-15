@@ -2,6 +2,7 @@
 # -*- coding:utf8 -*-
 import codecs
 import re
+import os
 from collections import Counter
 import numpy as np
 
@@ -30,7 +31,7 @@ def clean_str(string):
     return string.strip().lower()
 
 def get_stopwords():
-    stopwords_dir = '/home/ljw/PycharmProjects/Structure_Func_Recognition/data/stopwords.txt'
+    stopwords_dir = os.getcwd()+'/stopwords.txt'
     stopwords = []
     with codecs.open(stopwords_dir, encoding='iso-8859-1') as fp:
         while True:
@@ -167,6 +168,7 @@ def get_dictionary_header(all_data_path, vacab_size):
                 dictionary = []
                 for i in range(0, vacab_size):
                     dictionary.append(count[i][0])
+                    # print(count[i])
                 print(dictionary)
                 return dictionary     # 返回词典
             tmp = line.strip().split('\t')[-2:]
@@ -210,10 +212,11 @@ if __name__ == '__main__':
     # c = Counter('I I ARE a a kind girl I')
     # print(wordcount('I I a a kind girl I'))
     # print(c.most_common(3))
-    data_dir = '/home/ljw/PycharmProjects/Structure_Func_Recognition/data/header500'
+    data_dir = os.getcwd()+'/test_para'
+    all_data_dir = os.getcwd()+'/paragraph500'
     # dic = get_dictionary(data_dir, 10)
     # print(dic)
     # print('beam 的 index： ', dic.index('beam'))
-    para2ids, labels = para2id_header(data_dir, 10)
-    print(para2ids.shape)
+    para2ids, labels = para2id(data_dir, all_data_dir, 10)
+    print(para2ids)
     # print(para2ids)
