@@ -1,3 +1,5 @@
+#! /user/bin/evn python
+# -*- coding:utf8 -*-
 import codecs
 import re
 import numpy as np

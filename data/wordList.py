@@ -30,7 +30,7 @@ def clean_str(string):
     return string.strip().lower()
 
 def get_stopwords():
-    stopwords_dir = '/Users/j_yee/PycharmProjects/Structure_Func_Recognition/data/stopwords.txt'
+    stopwords_dir = '/home/ljw/PycharmProjects/Structure_Func_Recognition/data/stopwords.txt'
     stopwords = []
     with codecs.open(stopwords_dir, encoding='iso-8859-1') as fp:
         while True:
@@ -61,8 +61,8 @@ def wordcount(str):
         else:
             count_dict[str] = 1
     #按照词频从高到低排列
-    count_list=sorted(count_dict.items(),key=lambda x:x[1],reverse=True)
-    return count_list
+    count_list = sorted(count_dict.items(), key=lambda x:x[1], reverse=True)
+    return np.array(count_list)
 
 
 # 直接使用counter（）
@@ -91,10 +91,9 @@ def wordcount(str):
 #             para = tmp[0]
 #             paras.append(para)
 
-def get_word_list(file_path, vacab_size):
+def get_dictionary(all_data_path, vacab_size):
     paras = []
-    labels = []
-    with codecs.open(file_path, encoding='utf-8') as fp:
+    with codecs.open(all_data_path, encoding='utf-8') as fp:
         while True:
             line = fp.readline()
             if not line:
@@ -105,20 +104,21 @@ def get_word_list(file_path, vacab_size):
                 print("vacabulary dictionary builded succesfully!")
 
                 count = wordcount(paragraph)
+                print(count.shape)
                 dictionary = []
-                for i in range(0,vacab_size):
+                for i in range(0, vacab_size):
                     dictionary.append(count[i][0])
-                    # print(count[i][0],count[i][1])
+                print(dictionary)
                 return dictionary     # 返回词典
             tmp = line.strip().split('\t')[-1:]
             para = tmp[0]
             paras.append(para)
 
 
-def para2id(file_path, vacab_size):
+def para2id(file_path, all_data_path, vacab_size):
     para2ids = []
     labels = []
-    dictionary = get_word_list(file_path, vacab_size)
+    dictionary = get_dictionary(all_data_path, vacab_size)
     with codecs.open(file_path, encoding='utf-8') as fp:
         while True:
             line = fp.readline()
@@ -147,15 +147,73 @@ def para2id(file_path, vacab_size):
             para2ids.append(para2id)
 
 
+# header数据格式和paragaph section不同  label位置
+def get_dictionary_header(all_data_path, vacab_size):
+    # file_path = './data/header'
+    # vacab_size = 2000
+    paras = []
+    with codecs.open(all_data_path, encoding='utf-8') as fp:
+        while True:
+            line = fp.readline()
+            if not line:
+                paragraph = ''
+                for para in paras:
+                    paragraph = paragraph + clean_str(para)
+                # print(paragraph)
+                print("vacabulary dictionary builded succesfully!")
+
+                count = wordcount(paragraph)
+                # print(count.shape)
+                dictionary = []
+                for i in range(0, vacab_size):
+                    dictionary.append(count[i][0])
+                print(dictionary)
+                return dictionary     # 返回词典
+            tmp = line.strip().split('\t')[-2:]
+            para = tmp[0]
+            paras.append(para)
+
+
+def para2id_header(file_path, all_data_path, vacab_size):
+    para2ids = []
+    labels = []
+    dictionary = get_dictionary_header(all_data_path, vacab_size)
+    with codecs.open(file_path, encoding='utf-8') as fp:
+        while True:
+            line = fp.readline()
+            if not line:
+                print("Data loaded successfully!")
+                return [np.array(para2ids), np.array(labels)]
+
+            tmp = line.strip().split('\t')[-2:]
+            para, label = tmp[0], int(tmp[1])
+            if label == 1:
+                labels.append([1, 0, 0, 0, 0])
+            elif label == 2:
+                labels.append([0, 1, 0, 0, 0])
+            elif label == 3:
+                labels.append([0, 0, 1, 0, 0])
+            elif label == 4:
+                labels.append([0, 0, 0, 1, 0])
+            else:
+                labels.append([0, 0, 0, 0, 1])
+            para2id = np.zeros(vacab_size)
+            para_list = para.split(' ')
+            for word in [clean_str(word) for word in para_list]:
+                if word in dictionary:
+                    index = dictionary.index(word)
+                    para2id[index] = para2id[index] + 1
+            para2ids.append(para2id)
+
+
 if __name__ == '__main__':
-    a = ['you','are','a', 'kind','kind','a','girl']
-    print(Counter(a).most_common(3))
-    # c = Counter('you  ARE a a kind girl I')
-    # print(wordcount('you are a a kind girl I'))
+    # c = Counter('I I ARE a a kind girl I')
+    # print(wordcount('I I a a kind girl I'))
     # print(c.most_common(3))
-    # dic = get_word_list('/Users/j_yee/PycharmProjects/Structure_Func_Recognition/data/test_para',10)
+    data_dir = '/home/ljw/PycharmProjects/Structure_Func_Recognition/data/header500'
+    # dic = get_dictionary(data_dir, 10)
     # print(dic)
     # print('beam 的 index： ', dic.index('beam'))
-    # para2ids, labels = para2id('/Users/j_yee/PycharmProjects/Structure_Func_Recognition/data/test_para',10)
-    # print(para2ids.shape)
+    para2ids, labels = para2id_header(data_dir, 10)
+    print(para2ids.shape)
     # print(para2ids)
