@@ -31,7 +31,7 @@ def clean_str(string):
     return string.strip().lower()
 
 def get_stopwords():
-    stopwords_dir = os.getcwd()+'/stopwords.txt'
+    stopwords_dir = os.getcwd()+'/data/stopwords.txt'
     stopwords = []
     with codecs.open(stopwords_dir, encoding='iso-8859-1') as fp:
         while True:
