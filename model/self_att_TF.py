@@ -75,7 +75,7 @@ class SelfAttTF(object):
                 enc = feedforward(enc)
         return enc
 
-    def train(self):
+    def train(self, x, y):
         """
         :return:
             loss: scalar.
@@ -84,7 +84,7 @@ class SelfAttTF(object):
             summaries: training summary node.
         """
         with tf.name_scope('score'):
-            fc = tf.layers.dense(self.encode(self.input_x), self.num_units, name='fc1')
+            fc = tf.layers.dense(self.encode(x), self.num_units, name='fc1')
             fc = tf.nn.dropout(fc, keep_prob=self.dropout_keep_prob)
             fc = tf.nn.relu(fc)
 
@@ -96,7 +96,7 @@ class SelfAttTF(object):
         with tf.name_scope('loss'):
             # loss
             stop_logits = tf.stop_gradient(logits)
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(logits=stop_logits, labels=self.input_y)
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(logits=stop_logits, labels=y)
             loss = tf.reduce_mean(cross_entropy)
 
             # step
