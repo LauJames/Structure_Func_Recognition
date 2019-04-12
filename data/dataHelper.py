@@ -288,3 +288,9 @@ def word_iter(datasets, language='En'):
                     yield token
         else:
             raise NotImplementedError('Not support language!')
+
+
+def dynamic_padding(batch_data, pad_id, max_len):
+    pad_len = min(max_len, max(batch_data))
+    batch_data = [(ids + [pad_id] * (max_len - len(ids)))[: pad_len] for ids in batch_data]
+    return batch_data

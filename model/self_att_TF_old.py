@@ -17,7 +17,7 @@ import tensorflow.contrib as tc
 from model.layers.transformer import *
 
 
-class SelfAttTF2(object):
+class SelfAttTFold(object):
     """
     A Transformer encoder structure for text classification.
     """

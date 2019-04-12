@@ -21,7 +21,7 @@ import numpy as np
 import tensorflow as tf
 import csv
 from sklearn import metrics
-from model.self_att_TF_old import SelfAttTF2
+from model.self_att_TF_old import SelfAttTFold
 from data import dataHelper
 from data.vocab import Vocab
 
@@ -116,6 +116,24 @@ def prepare():
     print("Time usage:", time_dif)
 
 
+def train():
+    print("Configuring TensorBoard and Saver ...")
+    tensorboard_dir = FLAGS.tensorboard_dir
+    if not os.path.exists(tensorboard_dir):
+        os.makedirs(tensorboard_dir)
+
+    tf.summary.scalar("loss", model.loss)
+    tf.summary.scalar("accuracy", model.accuracy)
+    merged_summary = tf.summary.merge_all()
+    writer = tf.summary.FileWriter(tensorboard_dir)
+
+    # Configuring Saver
+
+    saver = tf.train.Saver()
+    if not os.path.exists(FLAGS.save_dir):
+        os.makedirs(FLAGS.save_dir)
+
+
 if __name__ == '__main__':
     # if len(sys.argv) != 2 or sys.argv[1] not in ['train', 'test']:
     #      raise ValueError("Please input: python3 runRNN_header.py [train/test]")
@@ -124,7 +142,7 @@ if __name__ == '__main__':
     #     print("{}={}".format(key.upper(), FLAGS.__flags[key].value))
     # print("")
     #
-    model = SelfAttTF2(
+    model = SelfAttTFold(
         sequence_length=FLAGS.seq_length,
         num_classes=FLAGS.num_classes,
         # vocab=
