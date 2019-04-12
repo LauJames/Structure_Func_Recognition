@@ -32,3 +32,4 @@
 /data/test_para
 /SVM/
 /model_DT/
+/data/glove.vectors.300d.noheader.txt

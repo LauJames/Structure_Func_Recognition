@@ -17,6 +17,8 @@ import re
 import codecs
 import tensorflow as tf
 import os
+import nltk
+import jieba
 from sklearn.model_selection import train_test_split
 
 
@@ -270,3 +272,19 @@ def batch_iter_per_epoch(x, y, batch_size=64):
         start_id = i * batch_size
         end_id = min((i + 1) * batch_size, data_len)
         yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]
+
+
+def word_iter(datasets, language='En'):
+    """对数据集每条数据进行分词，yield迭代每个词"""
+
+    if datasets is not None:
+        if language == 'En':
+            for sample in datasets:
+                for token in nltk.word_tokenize(sample):
+                    yield token
+        elif language == 'CN':
+            for sample in datasets:
+                for token in jieba.cut(sample):
+                    yield token
+        else:
+            raise NotImplementedError('Not support language!')
