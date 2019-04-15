@@ -164,9 +164,13 @@ def batch_iter_eval(x, y, batch_size=32):
     data_len = len(x)
     num_batch = int((data_len - 1) / batch_size) + 1
 
-    indices = np.random.permutation(np.arange(data_len))
-    x_shuffle = x[indices]
-    y_shuffle = y[indices]
+    # indices = np.random.permutation(np.arange(data_len))
+    # x_shuffle = x[indices]
+    # y_shuffle = y[indices]
+
+    # No shuffle
+    x_shuffle = x
+    y_shuffle = y
 
     for i in range(num_batch):
         start_id = i * batch_size
@@ -291,6 +295,13 @@ def word_iter(datasets, language='En'):
 
 
 def dynamic_padding(batch_data, pad_id, max_len):
-    pad_len = min(max_len, max(batch_data))
+    # dynamic paddig
+
+    # batch_len_list = [len(temp) for temp in batch_data]
+    # pad_len = min(max_len, max(batch_len_list))
+
+    # static padding
+    pad_len = max_len
+
     batch_data = [(ids + [pad_id] * (max_len - len(ids)))[: pad_len] for ids in batch_data]
     return batch_data

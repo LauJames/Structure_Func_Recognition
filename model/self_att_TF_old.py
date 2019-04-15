@@ -50,7 +50,7 @@ class SelfAttTFold(object):
         self.x_embedd += postitional_encoding(self.x_embedd, self.sequence_length)
 
         # Dropout
-        self.enc = tf.nn.dropout(self.x_embedd, rate=self.dropout_keep_prob)
+        self.enc = tf.nn.dropout(self.x_embedd, keep_prob=self.dropout_keep_prob)
 
         # Transformer Blocks
         for i in range(self.num_blocks):
@@ -59,13 +59,15 @@ class SelfAttTFold(object):
                 self.enc = multihead_attention(queries=self.enc,
                                                keys=self.enc,
                                                num_units=self.num_units,
-                                               dropout_rate=self.dropout_keep_prob,
+                                               dropout_rate=1 - self.dropout_keep_prob,
                                                causality=False)
                 # FFN
                 self.enc = feedforward(self.enc)
 
         with tf.name_scope('score'):
-            self.fc = tf.layers.dense(self.enc, self.num_units, name='fc1')
+            self.flatten = tf.layers.flatten(self.enc)
+
+            self.fc = tf.layers.dense(self.flatten, self.num_units, name='fc1')
             self.fc = tf.nn.dropout(self.fc, keep_prob=self.dropout_keep_prob)
             self.fc = tf.nn.relu(self.fc)
 
@@ -76,15 +78,15 @@ class SelfAttTFold(object):
 
         with tf.name_scope('loss'):
             # loss
-            self.stop_logits = tf.stop_gradient(self.logits)
-            self.cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.stop_logits, labels=self.input_y)
+            # self.stop_logits = tf.stop_gradient(self.logits)
+            self.cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.input_y)
             self.loss = tf.reduce_mean(self.cross_entropy)
 
             # step
-            self.global_step = tf.train.get_or_create_global_step()
+            # self.global_step = tf.train.get_or_create_global_step()
 
             # optimizer
-            self.train_optim = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, global_step=self.global_step)
+            self.train_optim = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
         with tf.name_scope('accuracy'):
             correct_predictions = tf.equal(self.y_pred, tf.argmax(self.input_y, 1))

@@ -184,7 +184,7 @@ def train():
             break
 
 
-def test():
+def predict():
     print("Loading test data ...")
     start_time = time.time()
     x_raw, y_test = dataHelper.get_header(FLAGS.test_data_file)
@@ -260,4 +260,4 @@ if __name__ == '__main__':
     #     train()
     # else:
     #      test()
-    test()
+    predict()

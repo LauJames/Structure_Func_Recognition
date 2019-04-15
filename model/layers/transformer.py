@@ -46,22 +46,21 @@ def layer_normalize(inputs,
 
 
 def postitional_encoding(inputs,
-                         num_units,
-                         zero_pad=True,
-                         scale=True,
+                         maxlen,
+                         masking=True,
                          scope="positional_encoding",
                          reuse=None):
     """
     Positional encoding. Construct a position embedding lookup table and lookup according to the inputs (position index)
-    :param inputs: Tensor. A 2D Tensor with shape of (N, T)
-    :param num_units: Int. Decided the output dimensionality.
-    :param zero_pad: Boolean. If true, all the values of the first row (id = 0) should be constant zero.
-    :param scale: Boolean. If true, the output will be multiplied by sqrt num_units (check details from paper)
+    :param inputs: Tensor. A 3D Tensor with shape of (N, T, E)
+    :param maxlen: scalar. Must be >= T
+    :param masking: Boolean. If true, padding postions are set to zero
     :param scope: String. Optional scope for 'variable_scope'.
     :param reuse: Boolean. Whether to reuse the weights of a previous layer by the same name.
     :return: Lookuped Position embeddings.
     """
-    N, T = inputs.get_shape().as_list()
+    E = inputs.get_shape().as_list()[-1]  # static
+    N, T = tf.shape(inputs)[0], tf.shape(inputs)[1]  # dynamic
     with tf.variable_scope(scope, reuse=reuse):
         position_index = tf.tile(tf.expand_dims(tf.range(T), 0), [N, 1])
 
@@ -73,25 +72,30 @@ def postitional_encoding(inputs,
         # In the paper, section 3.5, the embedding (before the application of sine or cosine)
         # for even positions in [0..num_units] indexed by 2*i is the same as that for odd positions.
         # take 2i as a whole part.
-        position_enc = np.array([[pos / np.power(10000, (i - i % 2)/num_units) for i in range(num_units)]
-                                 for pos in range(T)])
+        position_enc = np.array([[pos / np.power(10000, (i - i % 2)/E) for i in range(E)]
+                                 for pos in range(maxlen)])
 
         # Second part, apply the cosine to even columns and sin to odds.
         position_enc[:, 0::2] = np.sin(position_enc[:, 0::2])  # dim 2i
         position_enc[:, 1::2] = np.cos(position_enc[:, 1::2])  # dim 2i+1
+        position_enc = tf.convert_to_tensor(position_enc, tf.float32)  # (maxlen, E)
 
         # Convert to a tensor
-        lookup_table = tf.convert_to_tensor(position_enc)
+        outputs = tf.nn.embedding_lookup(position_enc, position_index)
 
-        if zero_pad:
-            lookup_table = tf.concat((tf.zeros(shape=[1, num_units]),
-                                      lookup_table[1:, :]), 0)
-        outputs = tf.nn.embedding_lookup(lookup_table, position_index)
+        # if zero_pad:
+        #     lookup_table = tf.concat((tf.zeros(shape=[1, num_units]),
+        #                               lookup_table[1:, :]), 0)
+        # outputs = tf.nn.embedding_lookup(lookup_table, position_index)
+        #
+        # if scale:
+        #     outputs = outputs * num_units ** 0.5
 
-        if scale:
-            outputs = outputs * num_units ** 0.5
+        # masks
+        if masking:
+            outputs = tf.where(tf.equal(inputs, 0), inputs, outputs)
 
-        return outputs
+        return tf.to_float(outputs)
 
 
 def multihead_attention(queries,
@@ -169,7 +173,7 @@ def multihead_attention(queries,
 
         # Dropouts
         # outputs = tf.layers.dropout(outputs, rate=dropout_rate, training=tf.convert_to_tensor(is_training))
-        outputs = tf.nn.dropout(outputs, rate=1-dropout_rate)
+        outputs = tf.nn.dropout(outputs, keep_prob=1-dropout_rate)
 
         # Weighted sum
         outputs = tf.matmul(outputs, V_)  # (h*N, T_q, C/h)
