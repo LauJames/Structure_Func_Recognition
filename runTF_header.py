@@ -41,14 +41,14 @@ tf.flags.DEFINE_string("tensorboard_dir", "tensorboard_dir/TF_header", "saving p
 tf.flags.DEFINE_string("save_dir", "checkpoints/TF_header", "save base dir")
 
 # Model Hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 300, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_integer("seq_length", 15, "sequence length (default: 600)")
 # tf.flags.DEFINE_integer("vocab_size", 8000, "vocabulary size (default: 5000)")
 tf.flags.DEFINE_integer("num_classes", 5, "Number of classes (default: 5)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.9, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 tf.flags.DEFINE_integer("num_blocks", 4, "number of layers (default: 2)")
-tf.flags.DEFINE_integer("num_units", 512, "neural numbers of hidden layer (default: 128)")
+tf.flags.DEFINE_integer("num_units", 256, "neural numbers of hidden layer (default: 128)")
 tf.flags.DEFINE_float("learning_rate", 0.0007, "learning rate (default:1e-3)")
 
 # Training parameters
@@ -130,7 +130,7 @@ def prepare():
         vocab.add(word)
 
     unfiltered_vocab_size = vocab.size()
-    vocab.filter_tokens_by_cnt(min_cnt=2)
+    vocab.filter_tokens_by_cnt(min_cnt=1)
     filter_num = unfiltered_vocab_size - vocab.size()
     print("After filter {} tokens, the final vocab size is {}".format(filter_num, vocab.size()))
 
@@ -281,11 +281,11 @@ if __name__ == '__main__':
     # print("")
     #
 
-    # if sys.argv[1] == 'prepare':
-    #     prepare()
-    # elif sys.argv[1] == 'train':
-    #     train()
-    # else:
-    #     predict()
+    if sys.argv[1] == 'prepare':
+        prepare()
+    elif sys.argv[1] == 'train':
+        train()
+    else:
+        predict()
     # prepare()
-    train()
+    # train()

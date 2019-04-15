@@ -43,6 +43,14 @@ class SelfAttTFold(object):
                 trainable=True)
             self.x_embedd = tf.nn.embedding_lookup(self.word_embeddings, self.input_x)
 
+            params = {"inputs": self.x_embedd,
+                      "filters": num_units,
+                      "kernel_size": 1,
+                      "activation": tf.nn.relu,
+                      "use_bias": True}
+
+            self.x_embedd = tf.layers.conv1d(**params)
+
         # Scale
         self.x_embedd *= self.vocab.embed_dim ** 0.5
 

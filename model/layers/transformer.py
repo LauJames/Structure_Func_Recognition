@@ -191,7 +191,8 @@ def multihead_attention(queries,
 
 
 def feedforward(inputs,
-                num_units=[2048, 512],
+                # num_units=[2048, 512],
+                num_units=[1024, 256],
                 scope="multihead_attention",
                 reuse=None):
     """
